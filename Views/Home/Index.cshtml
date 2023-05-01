@@ -1,0 +1,66 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+
+@model Highscore.Controllers.HomeController.GameXLeaderboardModel
+
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Highscore List</h2>
+        </div>
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <div class="col-6 text-end">
+                <a asp-controller="HighScores" asp-action="Create" class="btn btn-primary">
+                    <i class="bi bi-patch-plus"></i>
+                    &nbsp; Create New Highscore
+                </a>
+            </div>
+            
+        }
+    </div>
+    </div>
+    <br />
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>
+                    Game Name
+                </th>
+                <th>
+                    Player Name
+                </th>
+                <th>
+                    Highscore Date
+                </th>
+                <th>
+                    Points
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+                @foreach (var obj in Model.highscores)
+                {
+                    <tr>
+                        <td width="50%">
+                            <a href="/games/@obj.Game.UrlSlug">@obj.Game.Name</a>
+                        </td>
+                        <td width="30%">
+                            @obj.PlayerName
+                        </td>
+                        <td width="30%">
+                            @obj.HighscoreDate.ToShortDateString()
+                        </td>
+                        <td width="30%">
+                            @obj.Points
+                        </td>
+                    </tr>
+
+
+                }
+
+        </tbody>
+    </table>
+
+</div>

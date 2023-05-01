@@ -1,0 +1,30 @@
+﻿@model List<Score>
+
+<h2>High Scores</h2>
+@if (Model.Any())
+{
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>Player Name</th>
+                <th>Date</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var highScore in Model)
+            {
+                <tr>
+                    <td width="30%">@highScore.PlayerName</td>
+                    <td width="30%">@highScore.HighscoreDate.ToShortDateString()</td>
+                    <td width="30%">@highScore.Points</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    }
+    else
+    {
+    <p>No high scores yet!</p>
+    }

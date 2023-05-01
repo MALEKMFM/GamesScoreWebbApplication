@@ -1,0 +1,18 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Highscore.Models;
+
+public class Game
+{
+    [NotMapped]
+    public List<Score> HighScores { get; set; }
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public DateTime ReleaseDate { get; set; }
+    public Uri ImageUrl { get; set; }
+
+    [MaxLength(50)]
+    public string? UrlSlug { get; set; }
+}
