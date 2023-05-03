@@ -1,9 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Highscore.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace Highscore.Areas.API.Models.DTO;
 
 public class GameDto
 {
+    [NotMapped]
+    public List<Score> HighScores { get; set; }
     public int Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }

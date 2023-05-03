@@ -4,6 +4,7 @@ using Highscore.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Highscore.Areas.API.Controllers;
 
@@ -19,51 +20,70 @@ public class GamesController : ControllerBase
         this._context = context;
     }
 
-    [HttpGet("{Name}")]
-    public ActionResult<IEnumerable<GameDto>>GetSearchedGame(string name)
+    public IEnumerable<GameDto> GetGames([FromQuery] string? name)
     {
-        var searchedGames = _context.Games.Where(x => x.Name == name).ToList();
-        if (searchedGames is null)
+        var games = name is null
+        ? _context.Games.ToList()
+        : _context.Games.Where(x => x.Name.Contains(name)).ToList();
+
+        var gamesDtos = games.Select(ToGamesDto);
+
+        return gamesDtos;
+    }
+
+    [HttpGet("{id}")]
+    public ActionResult<GameDto> GetGame(int id)
+    {
+        var game =
+           _context.Games.FirstOrDefault(x => x.Id == id);
+
+        if (game is null)
         {
+            // Returnera 404 Not Found om produkten inte hittades
             return NotFound();
         }
 
-        var searchedGameDtos = searchedGames.Select(game => new GameDto
-        {
-            Id = game.Id,
-            Name = game.Name,
-            Description = game.Description,
-        }).ToList();
+        var gameDto = ToGamesDto(game);
 
-        return searchedGameDtos;
+        return gameDto;
     }
 
     [HttpPost]
-    public IActionResult CreateHighscore(NewScoreDto newScoreDto)
+    public IActionResult CreateGame(NewGameDto newGameDto)
     {
-        var score = new Score
+        var game = new Game
         {
-            GameId = newScoreDto.GameId,
-            Game = newScoreDto.Game,
-            HighscoreDate = newScoreDto.HighscoreDate,
-            PlayerName = newScoreDto.PlayerName,
-            Points = newScoreDto.Points,
+            Description = newGameDto.Description,
+            Name = newGameDto.Name,
+            ImageUrl = newGameDto.ImageUrl,
+            ReleaseDate = newGameDto.ReleaseDate,
         };
 
-        _context.Highscores.Add(score);
+
+
+        game.UrlSlug = game.Name
+            .Replace("-", "")
+            .Replace(" ", "-")
+            .ToLower();
+
+        _context.Games.Add(game);
         _context.SaveChanges();
 
-        var scoreDto = new ScoreDto
-        {
-            Id = score.Id,
-            GameId = score.GameId,
-            Game = score.Game,
-            HighscoreDate = score.HighscoreDate,
-            PlayerName = score.PlayerName,
-            Points = score.Points,
-        };
+        var gameDto = ToGamesDto(game);
 
-        return Created("", scoreDto);
+        return Created("", gameDto);
     }
 
+    private GameDto ToGamesDto(Game game)
+    => new GameDto
+    {
+        HighScores = game.HighScores,
+        Id = game.Id,
+        Name = game.Name,
+        Description = game.Description,
+        ReleaseDate = game.ReleaseDate,
+        ImageUrl = game.ImageUrl,
+        UrlSlug = game.UrlSlug,
+    };
 }
+
